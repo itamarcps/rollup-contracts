@@ -11,7 +11,6 @@ describe("MyToken Lifecycle Test", function () {
   before(async function () {
     // Get signers
     [owner, addr1, addr2, signer] = await ethers.getSigners();
-
     // Deploy MyTokenMintable contract
     MyTokenMintable = await ethers.getContractFactory("MyTokenMintable");
     myTokenMintable = await MyTokenMintable.deploy(100, signer.address);

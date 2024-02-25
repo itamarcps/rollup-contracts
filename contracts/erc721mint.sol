@@ -62,7 +62,10 @@ contract MyTokenMintable is ERC721 {
         // Console.log the abi.encode(tokenId, preBurnedTokens_[tokenId].user)
         console.logBytes(abi.encodePacked(tokenId, preBurnedTokens_[tokenId].user));        
         // Now, we do ecrecover to get the address of the signer
-        address recoveredSigner = ecrecover(messageHash, v, r, s);
+        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, messageHash));
+        
+        address recoveredSigner = ecrecover(prefixedHashMessage, v, r, s);
         // console.log the recovered signer
         console.logAddress(recoveredSigner);
         // console.log the signer

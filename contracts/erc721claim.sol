@@ -36,7 +36,9 @@ contract MyTokenClaimable is ERC721 {
         // Console.log the abi.encode(tokenId, user)
         console.logBytes(abi.encodePacked(tokenId, user));
         // Recover the signer from the signature
-        address recoveredSigner = ecrecover(messageHash, v, r, s);
+        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, messageHash));
+        address recoveredSigner = ecrecover(prefixedHashMessage, v, r, s);
         // Ensure the recovered signer is the same as the contract's signer
         require(recoveredSigner == signer_, "MyTokenClaimable: invalid signature");
         // Record the token as minted for the user
