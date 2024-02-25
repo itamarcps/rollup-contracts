@@ -6,7 +6,7 @@ describe("MyToken Lifecycle Test", function () {
   let MyTokenClaimable, myTokenClaimable;
   let owner, addr1, addr2, signer;
   let tokenId = 0;
-  let signMessage, signature, splitSignature;
+  let signature, splitSignature;
 
   before(async function () {
     // Get signers
@@ -35,41 +35,59 @@ describe("MyToken Lifecycle Test", function () {
   });
 
   it("Sign the burn message", async function () {
-    /// Encode the mensage hash using abi.encodePackedx 
-    const AbiCoder = new ethers.AbiCoder();
-    // Print AbiCoder.encode(["uint256", "address"], [tokenId, addr1.address]);
-    console.log(AbiCoder.encode(["uint256", "address"], [tokenId, addr1.address]));
+    // /// Encode the mensage hash using abi.encodePackedx
+    // const AbiCoder = new ethers.AbiCoder();
+    // // Print AbiCoder.encode(["uint256", "address"], [tokenId, addr1.address]);
+    // console.log(
+    //   AbiCoder.encode(["uint256", "address"], [tokenId, addr1.address])
+    // );
     // print MyTokenMintable.message(tokenId, MyTokenMintable.preBurnedTokens(tokenId).user);
     let preBurnedTokens = await myTokenMintable.preBurnedTokens(tokenId);
-    console.log(await myTokenMintable.message(tokenId, preBurnedTokens.user));
-    const messageHash = ethers.solidityPackedKeccak256(["uint256", "address"], [tokenId, preBurnedTokens.user]);
+    // console.log(await myTokenMintable.message(tokenId, preBurnedTokens.user));
+    const messageHash = ethers.solidityPackedKeccak256(
+      ["uint256", "address"],
+      [tokenId, preBurnedTokens.user]
+    );
     // print the message hash
-    console.log(messageHash);
+    // console.log(messageHash);
     // print MyTokenMintable.messageHash(tokenId, MyTokenMintable.preBurnedTokens(tokenId).user);
-    
+
     // Sign the message hash (**DO NOT FORGET, WE ARE HASHING THE BYTES32 MESSAGE HASH, NOT A JS STRING!!!**)
     signature = await signer.signMessage(ethers.toBeArray(messageHash));
-    // print signature owner address
-    console.log(await signer.getAddress());
-    // print myTokenMintable.signer();
-    console.log(await myTokenMintable.signer());
+    // // print signature owner address
+    // console.log(await signer.getAddress());
+    // // print myTokenMintable.signer();
+    // console.log(await myTokenMintable.signer());
     splitSignature = ethers.Signature.from(signature);
-    let address = ethers.verifyMessage(ethers.toBeArray(messageHash), splitSignature);
+    let address = ethers.verifyMessage(
+      ethers.toBeArray(messageHash),
+      splitSignature
+    );
 
-    console.log("js derived address: " + address);
+    // console.log("js derived address: " + address);
   });
 
   it("Burn the token", async function () {
-    // Print V
-    console.log("v" + splitSignature.v);
-    // Print R
-    console.log("r" + splitSignature.r);
-    // Print S
-    console.log ("s" + splitSignature.s);
-    await myTokenMintable.connect(signer).burn(tokenId, splitSignature.v, splitSignature.r, splitSignature.s);
+    // // Print V
+    // console.log("v" + splitSignature.v);
+    // // Print R
+    // console.log("r" + splitSignature.r);
+    // // Print S
+    // console.log("s" + splitSignature.s);
+    await myTokenMintable
+      .connect(signer)
+      .burn(tokenId, splitSignature.v, splitSignature.r, splitSignature.s);
   });
 
   it("Claim the token", async function () {
-    await myTokenClaimable.connect(addr2).mint(tokenId, addr1.address, splitSignature.v, splitSignature.r, splitSignature.s);
+    await myTokenClaimable
+      .connect(addr2)
+      .mint(
+        tokenId,
+        addr1.address,
+        splitSignature.v,
+        splitSignature.r,
+        splitSignature.s
+      );
   });
 });

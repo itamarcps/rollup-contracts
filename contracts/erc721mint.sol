@@ -22,8 +22,9 @@ contract MyTokenMintable is ERC721 {
     mapping (uint256 => BurnedToken) private burnedTokens_;
 
     /// Initialize the contract with the max supply and the signer address
-    constructor(uint256 maxSupplyInit, address signerInit) 
-            ERC721("MyTokenMintable", "MTM") {
+    constructor(uint256 maxSupplyInit, address signerInit) // Name and ticker of the token
+        ERC721("MyTokenMintable", "MTM") {
+        // Contract parameters initialization
         tokenIdCounter_ = 0;
         totalSupply_ = 0;
         maxSupply_ = maxSupplyInit;
@@ -32,7 +33,9 @@ contract MyTokenMintable is ERC721 {
 
     function mint(address to) external {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
+        // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
+        // Housekeeping parameters
         tokenIdCounter_++;
         totalSupply_++;
     }
@@ -47,29 +50,12 @@ contract MyTokenMintable is ERC721 {
 
     function burn(uint256 tokenId, uint8 v, bytes32 r, bytes32 s) external {
         require(preBurnedTokens_[tokenId].exists, "MyTokenMintable: token is not pre-burned");
-        // CONSOLE.LOG v, r, s
-        console.log("v,r,s");
-        console.log(v);
-        console.logBytes32(r);
-        console.logBytes32(s);
+
         // Create the message hash based on the tokenId and the user, use abi non-standard packed encoding
-    
         bytes32 messageHash = keccak256(abi.encodePacked(tokenId, preBurnedTokens_[tokenId].user));
-        // Console.log "solidity message hash:"
-        console.log("solidity message hash:");
-        // Console.log the message hash
-        console.logBytes32(messageHash);
-        // Console.log the abi.encode(tokenId, preBurnedTokens_[tokenId].user)
-        console.logBytes(abi.encodePacked(tokenId, preBurnedTokens_[tokenId].user));        
-        // Now, we do ecrecover to get the address of the signer
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, messageHash));
-        
-        address recoveredSigner = ecrecover(prefixedHashMessage, v, r, s);
-        // console.log the recovered signer
-        console.logAddress(recoveredSigner);
-        // console.log the signer
-        console.logAddress(signer_);
+        // Hash the message to standardize EIP 712 without Domain for using eth_sign in ethers
+        address recoveredSigner = ecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);
+
         // Check if the signer is the same as the signer of the contract
         require(recoveredSigner == signer_, "MyToken Mintable: invalid signature");
         // Annotate the tokenId and the user (who is the owner of the token) as burned
@@ -80,6 +66,10 @@ contract MyTokenMintable is ERC721 {
 
     function message (uint256 tokenId, address user) external pure returns (bytes memory) {
         return abi.encode(tokenId, user);
+    }
+
+    function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
     }
 
 

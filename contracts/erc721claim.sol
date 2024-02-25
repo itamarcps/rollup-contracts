@@ -21,7 +21,7 @@ contract MyTokenClaimable is ERC721 {
 
     /// Initialize the contract with the max supply and the signer address
     constructor(uint256 maxSupplyInit, address signerInit) 
-            ERC721("MyTokenClaimable", "MTC") {
+        ERC721("MyTokenClaimable", "MTC") {
         maxSupply_ = maxSupplyInit;
         signer_ = signerInit;
     }
@@ -31,20 +31,21 @@ contract MyTokenClaimable is ERC721 {
         require(!mintedTokens_[tokenId].exists, "MyTokenClaimable: token already minted");
         // Create the message hash based on the tokenId and the user address
         bytes32 messageHash = keccak256(abi.encodePacked(tokenId, user));
-        // Console.log the message hash
-        console.logBytes32(messageHash);
-        // Console.log the abi.encode(tokenId, user)
-        console.logBytes(abi.encodePacked(tokenId, user));
-        // Recover the signer from the signature
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        bytes32 prefixedHashMessage = keccak256(abi.encodePacked(prefix, messageHash));
-        address recoveredSigner = ecrecover(prefixedHashMessage, v, r, s);
+        // Recover the signature
+        address recoveredSigner = ecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);
+
         // Ensure the recovered signer is the same as the contract's signer
         require(recoveredSigner == signer_, "MyTokenClaimable: invalid signature");
+        
         // Record the token as minted for the user
         mintedTokens_[tokenId] = MintedToken(true, user, v, r, s);
         ++totalSupply_;
         _safeMint(user, tokenId);
+    }
+
+
+    function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
     }
 
     // Getter for the total supply of minted tokens
