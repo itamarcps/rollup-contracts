@@ -21,6 +21,13 @@ contract MyTokenMintable is ERC721 {
     mapping (uint256 => BurnedToken) private preBurnedTokens_;
     mapping (uint256 => BurnedToken) private burnedTokens_;
 
+    // Event
+    // Event to log preBurn 
+    event PreBurnedEvent(
+        uint256 tokenId,
+        address claimableOwner
+    );
+
     /// Initialize the contract with the max supply and the signer address
     constructor(uint256 maxSupplyInit, address signerInit) // Name and ticker of the token
         ERC721("MyTokenMintable", "MTM") {
@@ -46,6 +53,8 @@ contract MyTokenMintable is ERC721 {
         _burn(tokenId);
         // Annotate the tokenId and the user (who is the owner of the token) as pre-burned
         preBurnedTokens_[tokenId] = BurnedToken(true, _msgSender(), 0, 0x0, 0x0);
+        // Emit Preburned event
+        emit PreBurnedEvent(tokenId, _msgSender());
     }
 
     function burn(uint256 tokenId, uint8 v, bytes32 r, bytes32 s) external {

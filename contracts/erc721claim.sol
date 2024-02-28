@@ -41,6 +41,7 @@ contract MyTokenClaimable is ERC721 {
         mintedTokens_[tokenId] = MintedToken(true, user, v, r, s);
         ++totalSupply_;
         _safeMint(user, tokenId);
+
     }
 
 
