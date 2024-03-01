@@ -22,6 +22,12 @@ describe("MyToken Lifecycle Test", function () {
     // Wait for the contracts to be mined
     await myTokenMintable.waitForDeployment();
     await myTokenClaimable.waitForDeployment();
+
+    console.log("🚀 Mint token deployed successfully:", myTokenMintable.target);
+    console.log(
+      "🚀 Claim token deployed successfully:",
+      myTokenClaimable.target
+    );
   });
 
   it("Mint a token", async function () {
