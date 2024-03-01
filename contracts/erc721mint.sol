@@ -120,7 +120,15 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
         // Set the token URI
-        tokenIdRarity_[tokenIdCounter_] = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), block.timestamp, tokenIdCounter_))) % 3;
+        uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1)))) % 10000;
+        uint256 rarity = 0;
+        if (randomNum % 100 == 0) {
+            rarity = 1;
+        } else if (randomNum % 1000 == 0) {
+            rarity = 2;
+        }
+
+        tokenIdRarity_[tokenIdCounter_] = rarity;
         // Set the URi for the token with gold, silver and broze strings
         _setTokenURI(tokenIdCounter_, _getTokenRarityString(tokenIdRarity_[tokenIdCounter_]));
         // Housekeeping parameters
