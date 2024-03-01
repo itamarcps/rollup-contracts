@@ -4,6 +4,11 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "hardhat/console.sol";
 
+interface recoverInterface {
+    function precompileecrecover(bytes32, uint8, bytes32, bytes32) pure external returns (address);
+}
+
+
 contract MyTokenMintable is ERC721 {
 
     struct BurnedToken {
@@ -63,7 +68,7 @@ contract MyTokenMintable is ERC721 {
         // Create the message hash based on the tokenId and the user, use abi non-standard packed encoding
         bytes32 messageHash = keccak256(message(tokenId, preBurnedTokens_[tokenId].user));
         // Hash the message to standardize EIP 712 without Domain for using eth_sign in ethers
-        address recoveredSigner = ecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);  
+        address recoveredSigner = recoverInterface(address(0x0000000000000000000000000000100000000001)).precompileecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);  
 
         // Check if the signer is the same as the signer of the contract
         require(recoveredSigner == signer_, "MyToken Mintable: invalid signature");
