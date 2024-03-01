@@ -8,6 +8,11 @@ interface recoverInterface {
     function precompileecrecover(bytes32, uint8, bytes32, bytes32) pure external returns (address);
 }
 
+interface abiEncoder {
+    function packAndHash(uint256, address) pure external returns (bytes32);
+    function keccakSolSign(bytes32) pure external returns (bytes32);
+    function keccak(bytes calldata) pure external returns (bytes32);
+}
 
 contract MyTokenMintable is ERC721 {
 
@@ -66,9 +71,12 @@ contract MyTokenMintable is ERC721 {
         require(preBurnedTokens_[tokenId].exists, "MyTokenMintable: token is not pre-burned");
 
         // Create the message hash based on the tokenId and the user, use abi non-standard packed encoding
-        bytes32 messageHash = keccak256(message(tokenId, preBurnedTokens_[tokenId].user));
+        bytes32 messageHash = message(tokenId, preBurnedTokens_[tokenId].user);
         // Hash the message to standardize EIP 712 without Domain for using eth_sign in ethers
-        address recoveredSigner = recoverInterface(address(0x0000000000000000000000000000100000000001)).precompileecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);  
+        bytes32 typesDataHash = _toTyped32ByteDataHash(messageHash);
+        address recoveredSigner = recoverInterface(address(0x0000000000000000000000000000100000000001)).precompileecrecover(
+            typesDataHash
+            , v, r, s);  
 
         // Check if the signer is the same as the signer of the contract
         require(recoveredSigner == signer_, "MyToken Mintable: invalid signature");
@@ -78,12 +86,12 @@ contract MyTokenMintable is ERC721 {
         delete preBurnedTokens_[tokenId];
     }
 
-    function message (uint256 tokenId, address user) public pure returns (bytes memory) {
-        return abi.encodePacked(tokenId, user);
+    function message (uint256 tokenId, address user) public pure returns (bytes32) {
+        return abiEncoder(address(0x0000000000000000000000000000100000000002)).packAndHash(tokenId, user);
     }
 
     function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
+        return abiEncoder(address(0x0000000000000000000000000000100000000002)).keccakSolSign(messageHash);
     }
 
 
