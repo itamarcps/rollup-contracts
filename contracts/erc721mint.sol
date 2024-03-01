@@ -120,7 +120,7 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
         // Set the token URI
-        uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1)))) % 10000;
+        uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenIdCounter_))) % 10000;
         uint256 rarity = 0;
         if (randomNum % 100 == 0) {
             rarity = 1;
