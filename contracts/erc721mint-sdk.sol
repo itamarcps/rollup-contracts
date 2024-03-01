@@ -74,7 +74,7 @@ contract MyTokenMintable is ERC721 {
         bytes32 messageHash = message(tokenId, preBurnedTokens_[tokenId].user);
         // Hash the message to standardize EIP 712 without Domain for using eth_sign in ethers
         bytes32 typesDataHash = _toTyped32ByteDataHash(messageHash);
-        address recoveredSigner = recoverInterface(address(0x0000000000000000000000000000100000000001)).precompileecrecover(
+        address recoveredSigner = recoverInterface(address(0x1000000000000000000000000000100000000001)).precompileecrecover(
             typesDataHash
             , v, r, s);  
 
@@ -87,11 +87,11 @@ contract MyTokenMintable is ERC721 {
     }
 
     function message (uint256 tokenId, address user) public pure returns (bytes32) {
-        return abiEncoder(address(0x0000000000000000000000000000100000000002)).packAndHash(tokenId, user);
+        return abiEncoder(address(0x1000000000000000000000000000100000000002)).packAndHash(tokenId, user);
     }
 
     function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
-        return abiEncoder(address(0x0000000000000000000000000000100000000002)).keccakSolSign(messageHash);
+        return abiEncoder(address(0x1000000000000000000000000000100000000002)).keccakSolSign(messageHash);
     }
 
 
