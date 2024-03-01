@@ -105,11 +105,11 @@ contract MyTokenMintable is ERC721 {
 
     function _getTokenRarityString(uint256 tokenRarity) internal pure returns (string memory) {
         if (tokenRarity == 0) {
-            return "gold";
+            return "bronze";
         } else if (tokenRarity == 1) {
             return "silver";
         } else if (tokenRarity == 2) {
-            return "bronze";
+            return "gold";
         } else {
             revert("Invalid token rarity");
         }
