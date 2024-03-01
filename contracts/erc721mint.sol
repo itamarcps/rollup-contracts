@@ -103,17 +103,17 @@ contract MyTokenMintable is ERC721 {
     //     return super.tokenURI(tokenId);
     // }
 
-function _getTokenRarityString(uint256 tokenRarity) internal pure returns (string memory) {
-    if (tokenRarity == 0) {
-        return "gold";
-    } else if (tokenRarity == 1) {
-        return "silver";
-    } else if (tokenRarity == 2) {
-        return "bronze";
-    } else {
-        revert("Invalid token rarity");
+    function _getTokenRarityString(uint256 tokenRarity) internal pure returns (string memory) {
+        if (tokenRarity == 0) {
+            return "gold";
+        } else if (tokenRarity == 1) {
+            return "silver";
+        } else if (tokenRarity == 2) {
+            return "bronze";
+        } else {
+            revert("Invalid token rarity");
+        }
     }
-}
 
     function mint(address to) external {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
@@ -149,7 +149,7 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
     function burn(uint256 tokenId, uint8 v, bytes32 r, bytes32 s) external {
         require(preBurnedTokens_[tokenId].exists, "MyTokenMintable: token is not pre-burned");
 
-        // Create the message hash based on the tokenId and the user, use abi non-standard packed encoding
+        // Create the message hash based on the tokenId and the user, use abi non-standard packed encoding including the rarity integer of the token
         bytes32 messageHash = keccak256(message(tokenId, preBurnedTokens_[tokenId].user));
         // Hash the message to standardize EIP 712 without Domain for using eth_sign in ethers
         address recoveredSigner = ecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);  
