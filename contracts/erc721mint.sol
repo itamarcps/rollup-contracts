@@ -22,6 +22,7 @@ contract MyTokenMintable is ERC721 {
     uint256 private totalSupply_;
     uint256 private immutable maxSupply_;   
     address private immutable signer_;
+    address private owner_;
     mapping (uint256 => BurnedToken) private preBurnedTokens_;
     mapping (uint256 => BurnedToken) private burnedTokens_;
     mapping (uint256 => uint256) private tokenIdRarity_;
@@ -40,6 +41,7 @@ contract MyTokenMintable is ERC721 {
     constructor(uint256 maxSupplyInit, address signerInit, string memory baseURI) // Name and ticker of the token
         ERC721("MyTokenMintable", "MTM") {
         // Contract parameters initialization
+        owner_ = msg.sender;
         _tokenBaseURI = baseURI;
         tokenIdCounter_ = 0;
         totalSupply_ = 0;
@@ -49,6 +51,7 @@ contract MyTokenMintable is ERC721 {
 
 
     function setBaseURI(string memory baseURI) external {
+        require (owner_ == msg.sender, "SETBASEURI NOT OWNER");
         _tokenBaseURI = baseURI;
     }
 
