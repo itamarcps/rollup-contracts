@@ -151,8 +151,8 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
         delete preBurnedTokens_[tokenId];
     }
 
-    function message (uint256 tokenId, address user) public pure returns (bytes memory) {
-        return abi.encodePacked(tokenId, user);
+    function message (uint256 tokenId, address user) public view returns (bytes memory) {
+        return abi.encodePacked(tokenId, user, tokenIdRarity_[tokenId]);
     }
 
     function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
