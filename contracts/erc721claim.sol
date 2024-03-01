@@ -11,6 +11,7 @@ contract MyTokenClaimable is ERC721 {
         uint8 v;
         bytes32 r;
         bytes32 s;
+        uint256 rarity;
     }
 
     uint256 private totalSupply_;
@@ -27,10 +28,10 @@ contract MyTokenClaimable is ERC721 {
     }
 
     // Function to mint a token for a user
-    function mint(uint256 tokenId, address user, uint8 v, bytes32 r, bytes32 s) external {
+    function mint(uint256 tokenId, uint256 rarity, address user, uint8 v, bytes32 r, bytes32 s) external {
         require(!mintedTokens_[tokenId].exists, "MyTokenClaimable: token already minted");
         // Create the message hash based on the tokenId and the user address
-        bytes32 messageHash = keccak256(abi.encodePacked(tokenId, user));
+        bytes32 messageHash = keccak256(abi.encodePacked(tokenId, user, rarity));
         // Recover the signature
         address recoveredSigner = ecrecover(_toTyped32ByteDataHash(messageHash), v, r, s);
 
@@ -38,7 +39,7 @@ contract MyTokenClaimable is ERC721 {
         require(recoveredSigner == signer_, "MyTokenClaimable: invalid signature");
         
         // Record the token as minted for the user
-        mintedTokens_[tokenId] = MintedToken(true, user, v, r, s);
+        mintedTokens_[tokenId] = MintedToken(true, user, v, r, s, rarity);
         ++totalSupply_;
         _safeMint(user, tokenId);
 
