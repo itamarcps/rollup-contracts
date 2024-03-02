@@ -133,16 +133,20 @@ contract MyTokenMintable is ERC721 {
 
     function mint(address to) external {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
+        // Token count of the user
+        uint256 tokenCount = balanceOf(to);
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
 
         // Index update
-        // Token count of the user
-        uint256 tokenCount = balanceOf(to);
         // Update the mapping to include the tokenID to an inde
-        _ownedTokens[to][tokenCount + 1] = tokenIdCounter_;
+        _ownedTokens[to][tokenCount] = tokenIdCounter_;
         // Update the mapping to include the index to a tokenID
-        _ownedTokensIndex[to][tokenIdCounter_] = tokenCount+1;
+        _ownedTokensIndex[to][tokenIdCounter_] = tokenCount;
+
+        console.log("tokenIdCounter addressing", _ownedTokens[to][tokenCount]);
+        console.log("tokenCount", tokenCount);
+        console.log("tokenIdCounter_", tokenIdCounter_);
 
         // Set the token URI
         uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenIdCounter_))) % 10000;

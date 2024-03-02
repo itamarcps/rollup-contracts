@@ -43,6 +43,29 @@ describe("MyToken Lifecycle Test", function () {
     expect(await myTokenMintable.ownerOf(tokenId)).to.equal(addr1.address);
   });
 
+  it("Mint several tokens from different addresses and verify ownership", async function () {
+    // Define the addresses
+    const addresses = [addr1.address, addr2.address]; // Add more addresses if needed
+
+    // Define the number of tokens to mint for each address
+    const numTokensToMint = 4;
+
+    // Mint tokens for each address
+    for (const address of addresses) {
+      for (let i = 0; i < numTokensToMint; i++) {
+        await myTokenMintable.connect(owner).mint(address);
+      }
+    }
+
+    // Validate the ownership of minted tokens
+    for (const address of addresses) {
+      const tokenIds = await myTokenMintable.getAllTokensOwnedByUser(address);
+      for (let i = 0; i < numTokensToMint; i++) {
+        expect(await myTokenMintable.ownerOf(tokenIds[i])).to.equal(address);
+      }
+    }
+  });
+
   it("Preburn the token", async function () {
     await myTokenMintable.connect(addr1).preBurn(tokenId);
     // Implement your checks for preburn logic here
