@@ -132,6 +132,13 @@ describe("MyToken Lifecycle Test", function () {
       await myTokenMintable.connect(addr1).preBurn(tokenId);
     }
 
+    // get all preburned tokens
+    const preburnedTokens = await myTokenMintable
+      .connect(owner)
+      ._preburnedTokensByOwner();
+
+    console.log("preburnedTokens", preburnedTokens);
+
     // // Verify that all minted NFTs have been preburned
     // for (const tokenId of tokens) {
     //   await expect(myTokenMintable.ownerOf(tokenId)).to.be.reverted();
