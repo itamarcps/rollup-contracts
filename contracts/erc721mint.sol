@@ -81,7 +81,7 @@ contract MyTokenMintable is ERC721 {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
 
         string memory _tokenURI = _tokenURIs[tokenId];
@@ -135,6 +135,7 @@ contract MyTokenMintable is ERC721 {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
         // Token count of the user
         uint256 tokenCount = balanceOf(to);
+        console.log("first counter", tokenIdCounter_);
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
 

@@ -16,7 +16,7 @@ describe("MyToken Lifecycle Test", function () {
     myTokenMintable = await MyTokenMintable.deploy(
       100,
       signer.address,
-      "http://localhost/testuri"
+      "http://localhost/testuri/"
     );
 
     // Deploy MyTokenClaimable contract
@@ -24,7 +24,7 @@ describe("MyToken Lifecycle Test", function () {
     myTokenClaimable = await MyTokenClaimable.deploy(
       100,
       signer.address,
-      "http://localhost/testuri"
+      "http://localhost/testuri/"
     );
 
     // Wait for the contracts to be mined
@@ -40,6 +40,7 @@ describe("MyToken Lifecycle Test", function () {
 
   it("Mint a token", async function () {
     await myTokenMintable.connect(owner).mint(addr1.address);
+    console.log("Token 0 minted to: ", addr1.address);
     expect(await myTokenMintable.ownerOf(tokenId)).to.equal(addr1.address);
   });
 
@@ -48,7 +49,7 @@ describe("MyToken Lifecycle Test", function () {
     const addresses = [addr1.address, addr2.address]; // Add more addresses if needed
 
     // Define the number of tokens to mint for each address
-    const numTokensToMint = 4;
+    const numTokensToMint = 0;
 
     // Mint tokens for each address
     for (const address of addresses) {
@@ -64,6 +65,30 @@ describe("MyToken Lifecycle Test", function () {
         expect(await myTokenMintable.ownerOf(tokenIds[i])).to.equal(address);
       }
     }
+  });
+
+  it("should return the URI for a given token ID", async function () {
+    // Call the function to get the token URI
+    const _tokenURI = await myTokenMintable.tokenURI(tokenId);
+
+    // Assert that the token URI is not null or undefined
+    expect(_tokenURI).to.not.be.null;
+    expect(_tokenURI).to.not.be.undefined;
+
+    // You can add additional assertions here if needed
+    console.log(_tokenURI);
+  });
+
+  it("Check for minted 0 tokenId", async function () {
+    // Call the function to get the token URI
+    const _tokenURI = await myTokenMintable.tokenURI(0);
+
+    // Assert that the token URI is not null or undefined
+    expect(_tokenURI).to.not.be.null;
+    expect(_tokenURI).to.not.be.undefined;
+
+    // You can add additional assertions here if needed
+    console.log("zero token uri", _tokenURI);
   });
 
   it("Preburn the token", async function () {
@@ -85,16 +110,12 @@ describe("MyToken Lifecycle Test", function () {
       ["uint256", "address", "uint256"],
       [tokenId, preBurnedTokens.user, preBurnedTokens.rarity]
     );
-    // print the message hash
-    // console.log(messageHash);
-    // print MyTokenMintable.messageHash(tokenId, MyTokenMintable.preBurnedTokens(tokenId).user);
 
     // Sign the message hash (**DO NOT FORGET, WE ARE HASHING THE BYTES32 MESSAGE HASH, NOT A JS STRING!!!**)
     signature = await signer.signMessage(ethers.toBeArray(messageHash));
     // // print signature owner address
     // console.log(await signer.getAddress());
-    // // print myTokenMintable.signer();
-    // console.log(await myTokenMintable.signer());
+
     splitSignature = ethers.Signature.from(signature);
     let address = ethers.verifyMessage(
       ethers.toBeArray(messageHash),

@@ -7,27 +7,36 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
-
-  const lockedAmount = hre.ethers.parseEther("0.001");
-
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+  // Get signers
+  [owner, addr1, addr2, signer] = await ethers.getSigners();
+  // Deploy MyTokenMintable contract
+  MyTokenMintable = await ethers.getContractFactory("MyTokenMintable");
+  myTokenMintable = await MyTokenMintable.deploy(
+    100,
+    signer.address,
+    "http://localhost/testuri/"
   );
+
+  // Deploy MyTokenClaimable contract
+  MyTokenClaimable = await ethers.getContractFactory("MyTokenClaimable");
+  myTokenClaimable = await MyTokenClaimable.deploy(
+    100,
+    signer.address,
+    "http://localhost/testuri/"
+  );
+
+  // Wait for the contracts to be mined
+  await myTokenMintable.waitForDeployment();
+  await myTokenClaimable.waitForDeployment();
+
+  console.log("🚀 Mint token deployed successfully:", myTokenMintable.target);
+  console.log("🚀 Claim token deployed successfully:", myTokenClaimable.target);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// Execute deployment function
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
