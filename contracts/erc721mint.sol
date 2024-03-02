@@ -79,6 +79,12 @@ contract MyTokenMintable is ERC721 {
         return ownedTokens;
     }
 
+    // Get all preburned tokens owned by a user
+    function getPreburnedTokensByOwner(address owner) external view returns (uint256[] memory) {
+        return _preburnedTokensByOwner[owner];
+    }
+
+
     // // Function to get all token IDs owned by a user
     // function getAllPreBurnedTokensByUser(address user) external view returns (uint256[] memory) {
     //     uint256 tokenCount = balanceOf(user);

@@ -114,7 +114,7 @@ describe("MyToken Lifecycle Test", function () {
 
     const finalCount = await myTokenMintable.connect(owner).totalSupply();
 
-    console.log("ginalcount", finalCount);
+    console.log("Finalcount", finalCount);
 
     // Verify that owner owns all minted NFTs
     for (
@@ -135,7 +135,7 @@ describe("MyToken Lifecycle Test", function () {
     // get all preburned tokens
     const preburnedTokens = await myTokenMintable
       .connect(owner)
-      ._preburnedTokensByOwner();
+      .getPreburnedTokensByOwner(addr1.address);
 
     console.log("preburnedTokens", preburnedTokens);
 
