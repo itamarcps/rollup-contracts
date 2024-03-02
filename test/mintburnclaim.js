@@ -49,7 +49,7 @@ describe("MyToken Lifecycle Test", function () {
     const addresses = [addr1.address, addr2.address]; // Add more addresses if needed
 
     // Define the number of tokens to mint for each address
-    const numTokensToMint = 0;
+    const numTokensToMint = 3;
 
     // Mint tokens for each address
     for (const address of addresses) {
@@ -92,8 +92,50 @@ describe("MyToken Lifecycle Test", function () {
   });
 
   it("Preburn the token", async function () {
+    console.log("tokenId", tokenId);
+    console.log("addr1", addr1.address);
     await myTokenMintable.connect(addr1).preBurn(tokenId);
     // Implement your checks for preburn logic here
+  });
+
+  it("mint and preBurn multiple NFTs", async function () {
+    const numTokens = 5;
+    const tokens = [];
+    const currentTokenIdCount = await myTokenMintable
+      .connect(owner)
+      .totalSupply();
+
+    console.log("currentTokenIdCount", currentTokenIdCount);
+
+    // Mint NFTs
+    for (let i = 0; i < numTokens; i++) {
+      await myTokenMintable.connect(owner).mint(addr1.address);
+    }
+
+    const finalCount = await myTokenMintable.connect(owner).totalSupply();
+
+    console.log("ginalcount", finalCount);
+
+    // Verify that owner owns all minted NFTs
+    for (
+      let i = currentTokenIdCount + BigInt(1);
+      i < currentTokenIdCount + BigInt(numTokens - 2);
+      i++
+    ) {
+      console.log("i", i);
+      expect(await myTokenMintable.ownerOf(i)).to.equal(addr1.address);
+      tokens.push(i);
+    }
+
+    // Preburn all minted NFTs
+    for (const tokenId of tokens) {
+      await myTokenMintable.connect(addr1).preBurn(tokenId);
+    }
+
+    // // Verify that all minted NFTs have been preburned
+    // for (const tokenId of tokens) {
+    //   await expect(myTokenMintable.ownerOf(tokenId)).to.be.reverted();
+    // }
   });
 
   it("Sign the burn message", async function () {

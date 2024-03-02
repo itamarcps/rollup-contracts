@@ -62,6 +62,7 @@ contract MyTokenMintable is ERC721 {
     mapping(uint256 tokenId => string) private _tokenURIs;
 
     // Owned tokens implementation
+    mapping(address owner => uint256[]) public _preburnedTokensByOwner;
 
     mapping(address owner => mapping(uint256 index => uint256)) private _ownedTokens;
     mapping(address owner => mapping(uint256 tokenId => uint256)) private _ownedTokensIndex;
@@ -77,6 +78,18 @@ contract MyTokenMintable is ERC721 {
 
         return ownedTokens;
     }
+
+    // // Function to get all token IDs owned by a user
+    // function getAllPreBurnedTokensByUser(address user) external view returns (uint256[] memory) {
+    //     uint256 tokenCount = balanceOf(user);
+    //     uint256[] memory ownedTokens = new uint256[](tokenCount);
+
+    //     for (uint256 i = 0; i < tokenCount; i++) {
+    //         ownedTokens[i] = _ownedTokens[user][i];
+    //     }
+
+    //     return ownedTokens;
+    // }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
@@ -164,6 +177,19 @@ contract MyTokenMintable is ERC721 {
 
     function preBurn(uint256 tokenId) external {
         require(_msgSender() == ownerOf(tokenId), "MyTokenMintable: caller is not the owner");
+
+        _preburnedTokensByOwner[msg.sender].push(tokenId);
+
+        // uint256 _indexOfPreburn;
+        // console.log(_preburnedTokensByOwner[msg.sender].length);
+        // if (_preburnedTokensByOwner[msg.sender].length > 0) {
+        //     _indexOfPreburn = _preburnedTokensByOwner[msg.sender].length;
+        // } else {
+        //     _indexOfPreburn = 0;
+        // }
+        // console.log(_indexOfPreburn);
+        // _preburnedTokensByOwner[msg.sender][_indexOfPreburn] = tokenId;
+
         // burn the token
         _burn(tokenId);
         // Annotate the tokenId and the user (who is the owner of the token) as pre-burned
