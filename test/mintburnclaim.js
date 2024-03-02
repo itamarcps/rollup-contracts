@@ -13,11 +13,19 @@ describe("MyToken Lifecycle Test", function () {
     [owner, addr1, addr2, signer] = await ethers.getSigners();
     // Deploy MyTokenMintable contract
     MyTokenMintable = await ethers.getContractFactory("MyTokenMintable");
-    myTokenMintable = await MyTokenMintable.deploy(100, signer.address);
+    myTokenMintable = await MyTokenMintable.deploy(
+      100,
+      signer.address,
+      "http://localhost/testuri"
+    );
 
     // Deploy MyTokenClaimable contract
     MyTokenClaimable = await ethers.getContractFactory("MyTokenClaimable");
-    myTokenClaimable = await MyTokenClaimable.deploy(100, signer.address);
+    myTokenClaimable = await MyTokenClaimable.deploy(
+      100,
+      signer.address,
+      "http://localhost/testuri"
+    );
 
     // Wait for the contracts to be mined
     await myTokenMintable.waitForDeployment();
@@ -51,8 +59,8 @@ describe("MyToken Lifecycle Test", function () {
     let preBurnedTokens = await myTokenMintable.preBurnedTokens(tokenId);
     // console.log(await myTokenMintable.message(tokenId, preBurnedTokens.user));
     const messageHash = ethers.solidityPackedKeccak256(
-      ["uint256", "address"],
-      [tokenId, preBurnedTokens.user]
+      ["uint256", "address", "uint256"],
+      [tokenId, preBurnedTokens.user, preBurnedTokens.rarity]
     );
     // print the message hash
     // console.log(messageHash);
@@ -86,10 +94,12 @@ describe("MyToken Lifecycle Test", function () {
   });
 
   it("Claim the token", async function () {
+    let preBurnedTokens = await myTokenMintable.preBurnedTokens(tokenId);
     await myTokenClaimable
       .connect(addr2)
       .mint(
         tokenId,
+        preBurnedTokens.rarity,
         addr1.address,
         splitSignature.v,
         splitSignature.r,

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
 import "hardhat/console.sol";
 
 contract MyTokenMintable is ERC721 {
@@ -62,6 +61,23 @@ contract MyTokenMintable is ERC721 {
     // Optional mapping for token URIs
     mapping(uint256 tokenId => string) private _tokenURIs;
 
+    // Owned tokens implementation
+
+    mapping(address owner => mapping(uint256 index => uint256)) private _ownedTokens;
+    mapping(address owner => mapping(uint256 tokenId => uint256)) private _ownedTokensIndex;
+
+    // Function to get all token IDs owned by a user
+    function getAllTokensOwnedByUser(address user) external view returns (uint256[] memory) {
+        uint256 tokenCount = balanceOf(user);
+        uint256[] memory ownedTokens = new uint256[](tokenCount);
+
+        for (uint256 i = 0; i < tokenCount; i++) {
+            ownedTokens[i] = _ownedTokens[user][i];
+        }
+
+        return ownedTokens;
+    }
+
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
@@ -119,6 +135,15 @@ contract MyTokenMintable is ERC721 {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
+
+        // Index update
+        // Token count of the user
+        uint256 tokenCount = balanceOf(to);
+        // Update the mapping to include the tokenID to an inde
+        _ownedTokens[to][tokenCount + 1] = tokenIdCounter_;
+        // Update the mapping to include the index to a tokenID
+        _ownedTokensIndex[to][tokenIdCounter_] = tokenCount+1;
+
         // Set the token URI
         uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenIdCounter_))) % 10000;
         uint256 rarity = 0;
@@ -169,8 +194,6 @@ contract MyTokenMintable is ERC721 {
     function _toTyped32ByteDataHash(bytes32 messageHash) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
     }
-
-
 
     /// Getter for the total supply
     function totalSupply() external view returns (uint256) {
