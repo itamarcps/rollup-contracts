@@ -42,6 +42,7 @@ contract MyTokenMintableSdk is ERC721 {
     mapping (uint256 => BurnedToken) private preBurnedTokens_;
     mapping (uint256 => BurnedToken) private burnedTokens_;
     mapping (uint256 => uint256) private tokenIdRarity_;
+    mapping(address owner => uint256[]) public _preburnedTokensByOwner;
 
     // Event
     // Event to log preBurn 
@@ -66,6 +67,11 @@ contract MyTokenMintableSdk is ERC721 {
     }
 
 
+
+    // Get all preburned tokens owned by a user
+    function getPreburnedTokensByOwner(address owner) external view returns (uint256[] memory) {
+        return _preburnedTokensByOwner[owner];
+    }
     function setBaseURI(string memory baseURI) external {
         require (owner_ == msg.sender, "SETBASEURI NOT OWNER");
         _tokenBaseURI = baseURI;
@@ -182,6 +188,7 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
 
     function preBurn(uint256 tokenId) external {
         require(_msgSender() == ownerOf(tokenId), "MyTokenMintable: caller is not the owner");
+        _preburnedTokensByOwner[msg.sender].push(tokenId);
         // burn the token
         _burn(tokenId);
         // Annotate the tokenId and the user (who is the owner of the token) as pre-burned
