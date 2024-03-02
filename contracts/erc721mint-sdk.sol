@@ -159,9 +159,9 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
 
         // Index update
         // Update the mapping to include the tokenID to an inde
-        _ownedTokens[to][tokenCount + 1] = tokenIdCounter_;
+        _ownedTokens[to][tokenCount] = tokenIdCounter_;
         // Update the mapping to include the index to a tokenID
-        _ownedTokensIndex[to][tokenIdCounter_] = tokenCount+1;
+        _ownedTokensIndex[to][tokenIdCounter_] = tokenCount;
 
         // Set the token URI
         uint256 randomNum = Random(address(0x1000000000000000000000000000100000000003)).getRandom() % 10000;
