@@ -152,12 +152,12 @@ function _getTokenRarityString(uint256 tokenRarity) internal pure returns (strin
 
     function mint(address to) external {
         require(tokenIdCounter_ < maxSupply_, "MyTokenMintable: max supply reached");
+        // Token count of the user
+        uint256 tokenCount = balanceOf(to);
         // Mint the NFT to the user's provided address
         _safeMint(to, tokenIdCounter_);
 
         // Index update
-        // Token count of the user
-        uint256 tokenCount = balanceOf(to);
         // Update the mapping to include the tokenID to an inde
         _ownedTokens[to][tokenCount + 1] = tokenIdCounter_;
         // Update the mapping to include the index to a tokenID

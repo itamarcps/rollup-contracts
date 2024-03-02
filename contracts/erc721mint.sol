@@ -144,10 +144,6 @@ contract MyTokenMintable is ERC721 {
         // Update the mapping to include the index to a tokenID
         _ownedTokensIndex[to][tokenIdCounter_] = tokenCount;
 
-        console.log("tokenIdCounter addressing", _ownedTokens[to][tokenCount]);
-        console.log("tokenCount", tokenCount);
-        console.log("tokenIdCounter_", tokenIdCounter_);
-
         // Set the token URI
         uint256 randomNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenIdCounter_))) % 10000;
         uint256 rarity = 0;
